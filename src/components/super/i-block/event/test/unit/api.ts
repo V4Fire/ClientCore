@@ -11,6 +11,7 @@ import test from 'tests/config/unit/test';
 import { renderDummy } from 'components/super/i-block/event/test/helpers';
 
 import type bDummy from 'components/dummies/b-dummy/b-dummy';
+import { BOM, Component } from 'tests/helpers';
 
 test.describe('<i-block> event API', () => {
 	const componentName = 'b-dummy';
@@ -20,6 +21,38 @@ test.describe('<i-block> event API', () => {
 		await page.evaluate((componentName) => {
 			globalThis.componentName = componentName;
 		}, componentName);
+	});
+
+	test('the event handler should be removed by using off and providing cb', async ({page}) => {
+		const dummy = await Component.createComponent<bDummy>(page, 'b-dummy');
+
+		await dummy.evaluate((ctx) => {
+			ctx.testComponent = 'b-button-functional';
+		});
+
+		const childComponent = await Component.waitForComponentByQuery(page, '.b-button');
+
+		await childComponent.evaluate((ctx) => {
+			const dummy = ctx.$normalParent;
+
+			const handler = () => {
+				globalThis.testResult = true;
+			};
+
+			dummy?.once('hook:deactivated', handler);
+
+			ctx.unsafe.async.worker(() => {
+				dummy?.off('hook:deactivated', handler);
+			});
+		});
+
+		await BOM.waitForIdleCallback(page);
+		await childComponent.evaluate((ctx) => ctx.unsafe.$destroy());
+		await BOM.waitForIdleCallback(page);
+		await dummy.evaluate((ctx) => ctx.deactivate());
+		await BOM.waitForIdleCallback(page);
+
+		await test.expect(page.evaluate(() => globalThis.testResult)).resolves.toBeUndefined();
 	});
 
 	test('the event passed to `emit` should be normalized to camelCase', async ({page}) => {
