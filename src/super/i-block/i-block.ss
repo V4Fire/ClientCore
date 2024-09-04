@@ -252,11 +252,15 @@
 				- block headHelpers
 
 				- block innerRoot
+					- block bodyHeader
+
 					< ${rootWrapper ? '_' : '?'}.&__root-wrapper
 						< ${overWrapper ? '_' : '?'}.&__over-wrapper
 							- block overWrapper
 
 						- block body
+
+					- block bodyFooter
 
 					- block helpers
 					- block providers
