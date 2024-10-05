@@ -10,6 +10,7 @@ import type iStaticPage from 'super/i-static-page/i-static-page';
 import type { ComponentElement } from 'super/i-static-page/i-static-page';
 
 import { expandedParse } from 'core/prelude/test-env/components/json';
+import EventStore from 'core/prelude/test-env/event-store';
 
 globalThis.renderComponents = (
 	componentName: string,
@@ -73,10 +74,19 @@ globalThis.renderComponents = (
 	const
 		ids = scheme.map(() => Math.random());
 
-	const vNodes = scheme.map(({attrs, content}, i) => ctx.$createElement(componentName, {
+	const vNodes = scheme.map(({attrs, content, events}, i) => ctx.$createElement(componentName, {
 		attrs: {
 			'v-attrs': {
 				...attrs,
+
+				...events?.reduce((acc, name) => ({
+					...acc,
+					[name.startsWith('@') ? name : `@${name}`]: (el, ...args) => {
+						el.component.tmp.eventStore ??= new EventStore();
+						el.component.tmp.eventStore.push({name, args});
+					}
+				}), {}),
+
 				[idAttrs]: ids[i]
 			}
 		},

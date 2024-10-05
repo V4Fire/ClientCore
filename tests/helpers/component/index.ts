@@ -19,6 +19,9 @@ import type { ComponentInDummy } from 'tests/helpers/component/interface';
 // Temporary import until v4v4 migration
 import type { VNodeDescriptor } from 'base/b-virtual-scroll-new/interface';
 
+import type { EventStoreEntry } from 'core/prelude/test-env/event-store';
+import type EventStore from 'core/prelude/test-env/event-store';
+
 /**
  * Class provides API to work with components on a page
  */
@@ -240,6 +243,68 @@ export default class Component {
 		}), status);
 
 		return component;
+	}
+
+	/**
+	 * Returns all events emitted by the component that were listened to
+	 *
+	 * @param ctx
+	 * @param componentSelector
+	 */
+	static async getComponentEmittedEvents(ctx: Page | ElementHandle, componentSelector: string): Promise<EventStoreEntry[]> {
+		const
+			component = await this.waitForComponentByQuery(ctx, componentSelector);
+
+		return component.evaluate<EventStoreEntry[], iBlock & {tmp: {eventStore: EventStore}}>(
+			(ctx) => ctx.unsafe.tmp.eventStore.events
+		);
+	}
+
+	/**
+	 * Waits until the component emits specified event
+	 *
+	 * @param ctx
+	 * @param componentSelector
+	 * @param eventName
+	 * @param [eventArgs]
+	 */
+	static async waitForComponentEvent(
+		ctx: Page | ElementHandle,
+		componentSelector: string,
+		eventName: string,
+		...eventArgs: any[]
+	): Promise<boolean>;
+
+	/**
+	 * Waits until the component emits specified event
+	 *
+	 * @param ctx
+	 * @param componentSelector
+	 * @param event
+	 * @param [opts]
+	 */
+	static async waitForComponentEvent(
+		ctx: Page | ElementHandle,
+		componentSelector: string,
+		event: EventStoreEntry,
+		opts?: {timeout?: number}
+	): Promise<boolean>;
+
+	static async waitForComponentEvent(
+		ctx: Page | ElementHandle,
+		componentSelector: string,
+		...args: any[]
+	): Promise<boolean> {
+		const
+			[event, opts] = Object.isString(args[0]) ? [{name: args[0], args: args.slice(1)}, {}] : args,
+			component = await this.waitForComponentByQuery(ctx, componentSelector);
+
+		return component.evaluate(
+			(ctx, {event, opts}) => Boolean(
+				(<{eventStore: EventStore}>ctx.unsafe.tmp).eventStore?.waitEvent(event, opts?.timeout)
+			),
+			{event, opts}
+		);
 	}
 
 	/**
