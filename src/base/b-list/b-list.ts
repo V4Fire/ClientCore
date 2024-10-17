@@ -235,13 +235,15 @@ class bList extends iData implements iVisible, iWidth, iActiveItems {
 			return null;
 		};
 
-		return this.waitStatus('ready', () => {
-			if (this.multiple) {
-				return Object.isSet(active) ? [...active].flatMap((val) => getEl(val) ?? []) : [];
-			}
+		return this.waitStatus('ready')
+			.then(() => this.nextTick())
+			.then(() => {
+				if (this.multiple) {
+					return Object.isSet(active) ? [...active].flatMap((val) => getEl(val) ?? []) : [];
+				}
 
-			return getEl(active);
-		});
+				return getEl(active);
+			});
 	}
 
 	/** @see [[iActiveItems.prototype.getItemByValue] */
@@ -284,7 +286,10 @@ class bList extends iData implements iVisible, iWidth, iActiveItems {
 				}
 			}
 
-			SyncPromise.resolve(this.activeElement).then((selectedElement) => {
+			this.async.promise(
+				SyncPromise.resolve(this.activeElement),
+				{label: $$.selectActive}
+			).then((selectedElement) => {
 				const
 					els = Array.concat([], selectedElement);
 
