@@ -777,6 +777,23 @@ module.exports = config.createConfig({dirs: [__dirname, 'client']}, {
 		 */
 		assetsJS() {
 			return path.changeExt(this.assetsJSON(), '.js');
+		},
+
+		/**
+		 * Returns the path to the generated async assets chunks list within the output directory.
+		 * It contains an array of async chunks and their file names to inline them into fat-html.
+		 * ...
+		 * [
+		 *  {
+		 *   id: 'chunk_id',
+		 *   files: ['filename.ext']
+		 *  }
+		 * ]
+		 *
+		 * @return {string}
+		 */
+		asyncAssetsJSON() {
+			return 'async-chunks-to-inline.json';
 		}
 	},
 

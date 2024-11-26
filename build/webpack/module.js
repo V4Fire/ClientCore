@@ -60,9 +60,6 @@ module.exports = async function module({plugins}) {
 		g = await projectGraph,
 		isProd = webpack.mode() === 'production';
 
-	const
-		fatHTML = webpack.fatHTML();
-
 	const loaders = {
 		rules: new Map()
 	};
@@ -80,18 +77,13 @@ module.exports = async function module({plugins}) {
 		{
 			loader: 'monic-loader',
 			options: inherit(monic.typescript, {
-				replacers: [].concat(
-					fatHTML ?
-						[] :
+				replacers: [
 						include('build/monic/attach-component-dependencies'),
-
-					[
 						include('build/monic/require-context'),
 						include('build/monic/super-import'),
 						include('build/monic/ts-import'),
 						include('build/monic/dynamic-component-import')
 					]
-				)
 			})
 		}
 	];
@@ -241,13 +233,6 @@ module.exports = async function module({plugins}) {
 				options: {
 					name: `${output.replace(hashRgxp, '')}.html`
 				}
-			},
-
-			'extract-loader',
-
-			{
-				loader: 'html-loader',
-				options: config.html()
 			},
 
 			{

@@ -11,8 +11,7 @@
  */
 
 const
-	$C = require('collection.js'),
-	{webpack} = require('@config/config');
+	$C = require('collection.js');
 
 const
 	path = require('upath'),
@@ -29,10 +28,6 @@ const
  * @returns {!Promise<string>}
  */
 module.exports = async function attachComponentDependencies(str, filePath) {
-	if (webpack.fatHTML()) {
-		return str;
-	}
-
 	const
 		{components} = await graph;
 

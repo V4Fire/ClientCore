@@ -81,6 +81,37 @@ function getPageScriptDepsDecl(dependencies, {assets, wrap} = {}) {
 	return decl;
 }
 
+exports.getPageAsyncScripts = getPageAsyncScripts;
+
+function getPageAsyncScripts() {
+	if (!needInline()) {
+		return '';
+	}
+
+	const
+		fileName = webpack.asyncAssetsJSON(),
+		filePath = src.clientOutput(fileName);
+
+	try {
+		const
+			fileContent = fs.readFileSync(filePath, 'utf-8'),
+			asyncChunks = JSON.parse(fileContent);
+
+		if (webpack.mode() === 'production') {
+			return asyncChunks.reduce((result, chunk) => `${result}<template id="${chunk.id}"><script>${
+				chunk.files.map((fileName) => `include('${src.clientOutput(fileName)}');\n`).join()
+			}</script></template>`, '');
+		}
+
+		return `<div id="scripts-shadow-store">${asyncChunks.reduce((result, chunk) => `${result}<template id="${chunk.id}"><script id="${chunk.id}">${
+				chunk.files.map((fileName) => `include('${src.clientOutput(fileName)}');\n`).join()
+			}</script></template>`, '')}</div>`;
+
+	} catch (e) {
+		return '';
+	}
+}
+
 exports.getPageStyleDepsDecl = getPageStyleDepsDecl;
 
 /**

@@ -162,6 +162,7 @@
 						+= h.getPageStyleDepsDecl(ownDeps, {assets, wrap: true})
 
 					- block scripts
+						+= h.getPageAsyncScripts()
 						+= h.getScriptDeclByName('std', {assets, optional: true, wrap: true})
 						+= await h.loadLibs(deps.scripts, {assets, wrap: true, js: true})
 

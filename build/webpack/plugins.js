@@ -15,6 +15,8 @@ const
 	config = require('@config/config'),
 	webpack = require('webpack');
 
+const AsyncChunksPlugin = include('build/webpack/plugins/async-chunks-plugin');
+
 /**
  * Returns options for `webpack.plugins`
  * @returns {!Map}
@@ -54,9 +56,7 @@ module.exports = async function plugins({name}) {
 	}
 
 	if (config.webpack.fatHTML()) {
-		plugins.set('limit-chunk-count-plugin', new webpack.optimize.LimitChunkCountPlugin({
-			maxChunks: 1
-		}));
+		plugins.set('async-chunk-plugin', new AsyncChunksPlugin());
 	}
 
 	return plugins;

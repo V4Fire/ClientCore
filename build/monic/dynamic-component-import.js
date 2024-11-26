@@ -9,7 +9,7 @@
  */
 
 const
-	{typescript, webpack} = require('@config/config'),
+	{typescript} = require('@config/config'),
 	{commentModuleExpr: commentExpr} = include('build/const');
 
 const importRgxp = new RegExp(
@@ -19,8 +19,7 @@ const importRgxp = new RegExp(
 
 const
 	hasImport = importRgxp.removeFlags('g'),
-	isESImport = typescript().client.compilerOptions.module === 'ES2020',
-	fatHTML = webpack.fatHTML();
+	isESImport = typescript().client.compilerOptions.module === 'ES2020';
 
 /**
  * Monic replacer to enable dynamic imports of components
@@ -63,7 +62,7 @@ module.exports = function dynamicComponentImportReplacer(str) {
 			imports.push(decl);
 		}
 
-		if (!fatHTML) {
+		{
 			let
 				decl;
 
