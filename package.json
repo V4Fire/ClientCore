@@ -59,7 +59,7 @@
     "escaper": "3.0.6",
     "eventemitter2": "6.4.5",
     "jsdom": "16.7.0",
-    "path-to-regexp": "3.2.0",
+    "path-to-regexp": "3.3.0",
     "requestidlecallback": "0.3.0",
     "snakeskin": "7.5.1",
     "svg-transform-loader": "2.0.13",
