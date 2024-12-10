@@ -111,7 +111,7 @@
     "mini-css-extract-plugin": "2.5.3",
     "monic": "2.6.1",
     "monic-loader": "3.0.5",
-    "nanoid": "3.2.0",
+    "nanoid": "3.3.8",
     "nib": "1.1.2",
     "node-static": "0.7.11",
     "path-equal": "1.1.3",
